@@ -1,0 +1,20 @@
+function [ mean, variance, central_moment, mean_sq ] = statistics( pdf )
+%UNTITLED2 Summary of this function goes here
+%   Detailed explanation goes here
+
+s = length(pdf);
+
+mean = 0;
+mean_sq = 0;
+variance = 0;
+central_moment = 0;
+
+for i=1:length(pdf),
+    mean = mean + i*pdf(i);
+    mean_sq = mean_sq + (i^2) * pdf(i); 
+end
+
+for i=1:length(pdf),
+    central_moment = central_moment + (i - mean) * pdf(i);
+    variance = variance + (i - mean)^2 * pdf(i);
+end
