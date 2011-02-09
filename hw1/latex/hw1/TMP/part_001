@@ -1,0 +1,310 @@
+
+
+\documentclass[11pt]<<1>>article<<1>>
+\usepackage<<2>>amsmath,amsfonts,amsthm,amssymb<<2>>
+\usepackage<<3>>fullpage,fancyhdr<<3>>
+\usepackage[pdftex]<<4>>graphicx<<4>>
+\usepackage[usenames,dvipsnames]<<5>>color<<5>>
+\usepackage<<6>>listings<<6>>
+\usepackage<<7>>courier<<7>>
+\usepackage<<8>>ifthen<<8>>
+\usepackage<<9>>setspace<<9>>
+\usepackage<<10>>lastpage<<10>>
+\usepackage<<11>>extramarks<<11>>
+\usepackage<<12>>chngpage<<12>>
+\usepackage<<13>>soul<<13>>
+\usepackage<<14>>graphicx,float,wrapfig<<14>>
+\usepackage<<15>>epstopdf<<15>>
+\usepackage<<16>>geometry<<16>>
+\usepackage<<17>>pdfcolmk<<17>>
+\usepackage<<18>>hyperref<<18>>
+\DeclareGraphicsRule<<19>>.tif<<19>><<20>>png<<20>><<21>>.png<<21>><<22>>`convert #1 `dirname #1`/`basename #1 .tif`.png<<22>>
+\begin<<165>>tex2html_deferred<<165>>\par\end<<166>>tex2html_deferred<<166>>
+\definecolor<<23>>lightgray<<23>><<24>>gray<<24>><<25>>0.5<<25>>
+\definecolor<<26>>darkgray<<26>><<27>>gray<<27>><<28>>0.3<<28>>
+\definecolor<<29>>MyDarkGreen<<29>><<30>>rgb<<30>><<31>>0.0,0.4,0.0<<31>>
+\begin<<167>>tex2html_deferred<<167>>\par\end<<168>>tex2html_deferred<<168>>
+\topmargin=-0.45in      <tex2html_comment_mark>3
+\evensidemargin=0in     <tex2html_comment_mark>4
+\oddsidemargin=0in      <tex2html_comment_mark>5
+\textwidth=6.5in        <tex2html_comment_mark>6
+\textheight=9.0in       <tex2html_comment_mark>7
+\headsep=0.25in         <tex2html_comment_mark>8
+\begin<<169>>tex2html_deferred<<169>>\par\end<<170>>tex2html_deferred<<170>>
+\pagestyle<<32>>fancyplain<<32>>
+\begin<<171>>tex2html_deferred<<171>>\par\end<<172>>tex2html_deferred<<172>>
+\lstloadlanguages<<33>>Matlab<<33>><tex2html_comment_mark>10
+\lstset<<154>>language=Matlab,
+        frame=single,
+        basicstyle=\begin<<173>>tex2html_deferred<<173>>\ttfamily\end<<174>>tex2html_deferred<<174>>,
+        keywordstyle=[1]\begin<<175>>tex2html_deferred<<175>>\color<<34>>Blue<<34>>\end<<176>>tex2html_deferred<<176>>\begin<<177>>tex2html_deferred<<177>>\bf\end<<178>>tex2html_deferred<<178>>,
+        keywordstyle=[2]\begin<<179>>tex2html_deferred<<179>>\color<<35>>Purple<<35>>\end<<180>>tex2html_deferred<<180>>,
+        keywordstyle=[3]\begin<<181>>tex2html_deferred<<181>>\color<<36>>Blue<<36>>\end<<182>>tex2html_deferred<<182>>\underbar,
+        identifierstyle=,
+        commentstyle=\usefont<<37>>T1<<37>><<38>>pcr<<38>><<39>>m<<39>><<40>>sl<<40>>\begin<<183>>tex2html_deferred<<183>>\color<<41>>MyDarkGreen<<41>>\end<<184>>tex2html_deferred<<184>>\begin<<185>>tex2html_deferred<<185>>\small\end<<186>>tex2html_deferred<<186>>,
+        stringstyle=\begin<<187>>tex2html_deferred<<187>>\color<<42>>Purple<<42>>\end<<188>>tex2html_deferred<<188>>,
+        showstringspaces=false,
+        tabsize=5,
+        <tex2html_comment_mark>11
+morekeywords=<<43>>xlim,ylim,var,alpha,factorial,poissrnd,normpdf,normcdf<<43>>,
+        <tex2html_comment_mark>13
+morekeywords=[2]<<44>>on, off, interp<<44>>,
+        <tex2html_comment_mark>14
+morekeywords=[3]<<45>>FindESS<<45>>,
+        morecomment=[l][\begin<<189>>tex2html_deferred<<189>>\color<<46>>Blue<<46>>\end<<190>>tex2html_deferred<<190>>]<<47>>...<<47>>,
+        numbers=left,
+        firstnumber=1,
+        numberstyle=\begin<<191>>tex2html_deferred<<191>>\tiny\end<<192>>tex2html_deferred<<192>>\begin<<193>>tex2html_deferred<<193>>\color<<48>>Blue<<48>>\end<<194>>tex2html_deferred<<194>>,
+        stepnumber=5
+        <<154>>
+\begin<<195>>tex2html_deferred<<195>>\par\end<<196>>tex2html_deferred<<196>>
+\fancyhf<<49>><<49>>
+\begin<<197>>tex2html_deferred<<197>>\par\end<<198>>tex2html_deferred<<198>>
+\lhead<<155>>\fancyplain<<50>><<50>><<51>>Michael Carroll<<51>><<155>>
+\chead<<156>>\fancyplain<<52>><<52>><<53>>MECH7710<<53>><<156>>
+\rhead<<157>>\fancyplain<<54>><<54>><<55>>\today<<55>><<157>>
+\rfoot<<163>>\fancyplain<<56>><<56>><<158>>\begin<<199>>tex2html_deferred<<199>>\thepage\end<<200>>tex2html_deferred<<200>>\ of \pageref<<57>>LastPage<<57>><<158>><<163>>
+\begin<<201>>tex2html_deferred<<201>>\par\end<<202>>tex2html_deferred<<202>>
+\sloppy
+\begin<<203>>tex2html_nowrap<<203>>
+\setlength<<58>>\parindent<<58>><<59>>0pt<<59>>\end<<204>>tex2html_nowrap<<204>> 
+\begin<<205>>tex2html_deferred<<205>>\par\end<<206>>tex2html_deferred<<206>>
+\title<<164>>MECH7710 - HW1\\ 
+<<159>>\begin<<207>>tex2html_deferred<<207>>\large\end<<208>>tex2html_deferred<<208>>\begin<<60>>par<<60>>
+Random Variables and Probability
+\end<<61>>par<<61>> \vspace<<62>>1em<<62>>
+<<159>><<164>>
+\begin<<209>>tex2html_deferred<<209>>\author<<63>>Michael J. Carroll<<63>>\end<<210>>tex2html_deferred<<210>>
+\begin<<211>>tex2html_deferred<<211>>\par\end<<212>>tex2html_deferred<<212>>
+\begin<<64>>document<<64>>
+\maketitle
+\section*<<65>>Problem 1<<65>>
+\subsection*<<66>>Part A - 6 dice numbered 1,2,3,4,5,6<<66>>
+\begin<<213>>tex2html_deferred<<213>>\par\end<<214>>tex2html_deferred<<214>>
+\begin<<67>>lstlisting<<67>>[language=matlab]
+pdf_matrix = 1/6 * ones(6,6);
+pdf_combined = nfoldconv(pdf_matrix);
+[mean,variance] = statistics(pdf_combined);
+true_norm = normpdf([1:length(pdf_combined)],mean,sqrt(variance));
+if plots,
+    createfigure(true_norm, pdf_combined, 'Problem 1 - Part A')
+end
+\end<<68>>lstlisting<<68>>
+\begin<<215>>tex2html_deferred<<215>>\par\end<<216>>tex2html_deferred<<216>>
+\begin<<69>>figure<<69>>[here]
+	\begin<<70>>center<<70>>
+		\includegraphics [width=4in]<<71>>hw1_01.eps<<71>>
+		\begin<<217>>tex2html_deferred<<217>>\caption<<72>><<72>>\end<<218>>tex2html_deferred<<218>>
+		\label<<73>>fig:<<73>>
+	\end<<74>>center<<74>>
+\end<<75>>figure<<75>>
+\begin<<219>>tex2html_deferred<<219>>\par\end<<220>>tex2html_deferred<<220>>
+\subsection*<<76>>Part B - 6 dice numbered 4,5,6,7,8,9<<76>>
+\begin<<77>>lstlisting<<77>>[language=matlab]
+pdf_matrix = 1/6 * [zeros(6,3),ones(6,6)];
+pdf_combined = nfoldconv(pdf_matrix);
+[mean,variance] = statistics(pdf_combined);
+true_norm = normpdf([1:length(pdf_combined)],mean,sqrt(variance));
+if plots,
+    createfigure(true_norm, pdf_combined, 'Problem 1 - Part B')
+end
+\end<<78>>lstlisting<<78>>
+\begin<<221>>tex2html_deferred<<221>>\par\end<<222>>tex2html_deferred<<222>>
+\begin<<79>>figure<<79>>[here]
+	\begin<<80>>center<<80>>
+		\includegraphics [width=4in]<<81>>hw1_02.eps<<81>>
+		\begin<<223>>tex2html_deferred<<223>>\caption<<82>><<82>>\end<<224>>tex2html_deferred<<224>>
+		\label<<83>>fig:<<83>>
+	\end<<84>>center<<84>>
+\end<<85>>figure<<85>>
+\begin<<225>>tex2html_deferred<<225>>\par\end<<226>>tex2html_deferred<<226>>
+\subsection*<<86>>Part C - 6 dice numbered 1,1,3,3,3,5<<86>>
+\begin<<87>>lstlisting<<87>>[language=matlab]
+pdf_matrix = [...
+    1/3 * ones(6,1), zeros(6,1), ...
+    1/2 * ones(6,1), zeros(6,1), ...
+    1/6 * ones(6,1), zeros(6,1)];
+pdf_combined = nfoldconv(pdf_matrix);
+[mean,variance] = statistics(pdf_combined);
+true_norm = normpdf([1:length(pdf_combined)],mean,sqrt(variance));
+if plots,
+    createfigure(true_norm, pdf_combined, 'Problem 1 - Part C')
+end
+\end<<88>>lstlisting<<88>>
+\begin<<227>>tex2html_deferred<<227>>\par\end<<228>>tex2html_deferred<<228>>
+\begin<<89>>figure<<89>>[here]
+	\begin<<90>>center<<90>>
+		\includegraphics [width=4in]<<91>>hw1_03.eps<<91>>
+		\begin<<229>>tex2html_deferred<<229>>\caption<<92>><<92>>\end<<230>>tex2html_deferred<<230>>
+		\label<<93>>fig:<<93>>
+	\end<<94>>center<<94>>
+\end<<95>>figure<<95>>
+\begin<<231>>tex2html_deferred<<231>>\par\end<<232>>tex2html_deferred<<232>>
+\subsection*<<96>>Part D - 3 dice numbered 1,2,3,4,5,6 and 3 numbered 1,1,3,3,3,5<<96>>
+\begin<<97>>lstlisting<<97>>[language=matlab]
+pdf_matrix = [...
+    1/6*ones(3,6); ...
+    1/3 * ones(3,1), zeros(3,1), ...
+    1/2 * ones(3,1), zeros(3,1), ...
+    1/6 * ones(3,1), 1/6*zeros(3,1)];
+\begin<<233>>tex2html_deferred<<233>>\par\end<<234>>tex2html_deferred<<234>>
+pdf_combined = nfoldconv(pdf_matrix);
+[mean,variance] = statistics(pdf_combined);
+true_norm = normpdf([1:length(pdf_combined)],mean,sqrt(variance));
+if plots,
+    createfigure(true_norm, pdf_combined, 'Problem 1 - Part D')
+end
+\end<<98>>lstlisting<<98>>
+\begin<<235>>tex2html_deferred<<235>>\par\end<<236>>tex2html_deferred<<236>>
+\begin<<99>>figure<<99>>[here]
+	\begin<<100>>center<<100>>
+		\includegraphics [width=4in]<<101>>hw1_04.eps<<101>>
+		\begin<<237>>tex2html_deferred<<237>>\caption<<102>><<102>>\end<<238>>tex2html_deferred<<238>>
+		\label<<103>>fig:<<103>>
+	\end<<104>>center<<104>>
+\end<<105>>figure<<105>>
+\begin<<239>>tex2html_deferred<<239>>\par\end<<240>>tex2html_deferred<<240>>
+\section*<<106>>Problem 2<<106>>
+\subsection*<<107>>Part A - Mean, Central Moment, Mean Squared, Variance and Covariance<<107>>
+\begin<<241>>tex2html_deferred<<241>>\par\end<<242>>tex2html_deferred<<242>>
+\begin<<108>>lstlisting<<108>>[language=matlab]
+pdf_die_1 = 1/6 * ones(1,6);
+pdf_die_2 = 1/6 * ones(1,6);
+\begin<<243>>tex2html_deferred<<243>>\par\end<<244>>tex2html_deferred<<244>>
+die = 1:6;
+joint_pdf = pdf_die_1' * pdf_die_2;
+\begin<<245>>tex2html_deferred<<245>>\par\end<<246>>tex2html_deferred<<246>>
+[mean_1, variance_1, c_moment_1, mean_sq_1] = statistics(pdf_die_1);
+\begin<<247>>tex2html_deferred<<247>>\par\end<<248>>tex2html_deferred<<248>>
+covariance = sum(sum((die-mean_1)'*(die-mean_1) * joint_pdf));
+\begin<<249>>tex2html_deferred<<249>>\par\end<<250>>tex2html_deferred<<250>>
+P = [variance_1, covariance; covariance, variance_1];
+\begin<<251>>tex2html_deferred<<251>>\par\end<<252>>tex2html_deferred<<252>>
+v_1 = [1:6]; v_2 = [1:12];
+\begin<<253>>tex2html_deferred<<253>>\par\end<<254>>tex2html_deferred<<254>>
+joint_pdf = zeros(6,12); joint_v = zeros(6,12);
+\begin<<255>>tex2html_deferred<<255>>\par\end<<256>>tex2html_deferred<<256>>
+for ii=1:6,
+    joint_pdf(ii,ii+[1:6]) = 1/36;
+    for jj=1:6,
+        joint_v(ii,ii+jj) = ii+jj;
+    end
+end
+\begin<<257>>tex2html_deferred<<257>>\par\end<<258>>tex2html_deferred<<258>>
+[mean_v1, variance_v1, c_moment_v1, mean_sq_v1] = statistics(pdf_die_1)
+\begin<<259>>tex2html_deferred<<259>>\par\end<<260>>tex2html_deferred<<260>>
+mean_v2 = sum(sum(joint_v .* joint_pdf));
+mean_sq_v2 = sum(sum(joint_v.^2 .* joint_pdf));
+c_moment_v2 = sum(sum((joint_v - mean_v2) .* joint_pdf));
+variance_v2 = sum(sum((joint_v - mean_v2).^2 .* joint_pdf));
+\begin<<261>>tex2html_deferred<<261>>\par\end<<262>>tex2html_deferred<<262>>
+covariance_12 = sum(sum((v_1 - mean_v1)'*(v_2 - mean_v2) .* joint_pdf));
+\begin<<263>>tex2html_deferred<<263>>\par\end<<264>>tex2html_deferred<<264>>
+P = [variance_v1, covariance_12;
+    covariance_12, variance_v2]
+rho_12 = covariance_12/(sqrt(P(1,1)) * sqrt(P(2,2)))
+\end<<109>>lstlisting<<109>>
+\begin<<265>>tex2html_deferred<<265>>\par\end<<266>>tex2html_deferred<<266>>
+<<160>>\begin<<267>>tex2html_deferred<<267>>\color<<110>>lightgray<<110>>\end<<268>>tex2html_deferred<<268>> \begin<<269>>tex2html_deferred<<269>>\small\end<<270>>tex2html_deferred<<270>>\begin<<111>>tex2html_preform<<111>><tex2html_verbatim_mark>verbatim27#\end<<112>>tex2html_preform<<112>> <<160>>
+\begin<<271>>tex2html_deferred<<271>>\par\end<<272>>tex2html_deferred<<272>>
+\subsection*<<113>>Problem 3<<113>>
+    \begin<<114>>par<<114>>
+Worked on paper 1/27Th
+\end<<115>>par<<115>> \vspace<<116>>1em<<116>>
+\begin<<273>>tex2html_deferred<<273>>\par\end<<274>>tex2html_deferred<<274>>
+\subsection*<<117>>Problem 4<<117>>
+\begin<<275>>tex2html_deferred<<275>>\par\end<<276>>tex2html_deferred<<276>>
+\begin<<118>>lstlisting<<118>>[language=matlab]
+v_0 = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5];
+pdf_0 = 1/6 * ones(1,6);
+mean_v0 = mean(v_0)
+variance_v0 = var(v_0,pdf_0)
+r = 0.1; v = 0;
+\begin<<277>>tex2html_deferred<<277>>\par\end<<278>>tex2html_deferred<<278>>
+for jj = 1:length(r),
+    for ii=1:10000,
+        v(ii+1) = (1-r(jj))*v(ii) + r(jj)*v_0(randi(6));
+    end
+    mean_vn = mean(v)
+    var_vn = var(v)
+end
+\begin<<279>>tex2html_deferred<<279>>\par\end<<280>>tex2html_deferred<<280>>
+P_x = cov(v(1000:10000),v(900:9900))
+\begin<<281>>tex2html_deferred<<281>>\par\end<<282>>tex2html_deferred<<282>>
+\end<<119>>lstlisting<<119>>
+\begin<<283>>tex2html_deferred<<283>>\par\end<<284>>tex2html_deferred<<284>>
+<<161>>\begin<<285>>tex2html_deferred<<285>>\color<<120>>lightgray<<120>>\end<<286>>tex2html_deferred<<286>> \begin<<287>>tex2html_deferred<<287>>\small\end<<288>>tex2html_deferred<<288>>\begin<<121>>tex2html_preform<<121>><tex2html_verbatim_mark>verbatim28#\end<<122>>tex2html_preform<<122>> <<161>>
+\begin<<289>>tex2html_deferred<<289>>\par\end<<290>>tex2html_deferred<<290>>
+\subsection*<<123>>Problem 5<<123>>
+    \begin<<124>>par<<124>>
+Worked on paper 1/27Th
+\end<<125>>par<<125>> \vspace<<126>>1em<<126>>
+\begin<<291>>tex2html_deferred<<291>>\par\end<<292>>tex2html_deferred<<292>>
+\subsection*<<127>>Problem 6<<127>>
+\begin<<293>>tex2html_deferred<<293>>\par\end<<294>>tex2html_deferred<<294>>
+\begin<<128>>lstlisting<<128>>[language=matlab]
+P_x = [2, 1; 1, 4];
+\begin<<295>>tex2html_deferred<<295>>\par\end<<296>>tex2html_deferred<<296>>
+Mu = [0;0];
+[V,D] = eig(P_x);
+\begin<<297>>tex2html_deferred<<297>>\par\end<<298>>tex2html_deferred<<298>>
+theta = 2*pi*[0:0.001:1];
+for ii = 1:length(theta),
+    e(:,ii) = Mu + chol(P_x,'lower')*[cos(theta(ii));sin(theta(ii))];
+end
+\begin<<299>>tex2html_deferred<<299>>\par\end<<300>>tex2html_deferred<<300>>
+C = [0.25,1,1.25];
+\begin<<301>>tex2html_deferred<<301>>\par\end<<302>>tex2html_deferred<<302>>
+figure6 = figure('Name','Problem 6');
+axis equal, hold on
+\begin<<303>>tex2html_deferred<<303>>\par\end<<304>>tex2html_deferred<<304>>
+if plots,
+for ii = 1:length(C),
+    plot(C(ii)* e(1,:), C(ii)* e(2,:), 'Color','b');
+end
+\begin<<305>>tex2html_deferred<<305>>\par\end<<306>>tex2html_deferred<<306>>
+quiver(Mu(1),Mu(2),V(1,1),V(2,1), 'Color','k')
+quiver(Mu(1),Mu(2),V(1,2),V(2,2), 'Color','k')
+end
+\end<<129>>lstlisting<<129>>
+\begin<<307>>tex2html_deferred<<307>>\par\end<<308>>tex2html_deferred<<308>>
+\begin<<130>>figure<<130>>[here]
+	\begin<<131>>center<<131>>
+		\includegraphics [width=4in]<<132>>hw1_05.eps<<132>>
+		\begin<<309>>tex2html_deferred<<309>>\caption<<133>><<133>>\end<<310>>tex2html_deferred<<310>>
+		\label<<134>>fig:<<134>>
+	\end<<135>>center<<135>>
+\end<<136>>figure<<136>>
+\begin<<311>>tex2html_deferred<<311>>\par\end<<312>>tex2html_deferred<<312>>
+\subsection*<<137>>Problem 7<<137>>
+    \begin<<138>>par<<138>>
+To work on Paper
+\end<<139>>par<<139>> \vspace<<140>>1em<<140>>
+\begin<<313>>tex2html_deferred<<313>>\par\end<<314>>tex2html_deferred<<314>>
+\begin<<141>>lstlisting<<141>>[language=matlab]
+X = linspace(0,5,1000);
+\begin<<315>>tex2html_deferred<<315>>\par\end<<316>>tex2html_deferred<<316>>
+sigma = 2;
+\begin<<317>>tex2html_deferred<<317>>\par\end<<318>>tex2html_deferred<<318>>
+fx_pdf = normpdf(linspace(-5,5,1000),0,sigma);
+fy_pdf = 1./(sigma * sqrt(4*pi*X)) .* exp(-X./(4*sigma^2));
+\begin<<319>>tex2html_deferred<<319>>\par\end<<320>>tex2html_deferred<<320>>
+figure7 = figure('Name','Problem 7');
+if plots,
+plot(X,fy_pdf)
+hold
+plot(linspace(-5,5,1000),fx_pdf)
+end
+\end<<142>>lstlisting<<142>>
+\begin<<321>>tex2html_deferred<<321>>\par\end<<322>>tex2html_deferred<<322>>
+<<162>>\begin<<323>>tex2html_deferred<<323>>\color<<143>>lightgray<<143>>\end<<324>>tex2html_deferred<<324>> \begin<<325>>tex2html_deferred<<325>>\small\end<<326>>tex2html_deferred<<326>>\begin<<144>>tex2html_preform<<144>><tex2html_verbatim_mark>verbatim29#\end<<145>>tex2html_preform<<145>> <<162>>
+\begin<<327>>tex2html_deferred<<327>>\par\end<<328>>tex2html_deferred<<328>>
+\begin<<146>>figure<<146>>[here]
+	\begin<<147>>center<<147>>
+		\includegraphics [width=4in]<<148>>hw1_06.eps<<148>>
+		\begin<<329>>tex2html_deferred<<329>>\caption<<149>><<149>>\end<<330>>tex2html_deferred<<330>>
+		\label<<150>>fig:<<150>>
+	\end<<151>>center<<151>>
+\end<<152>>figure<<152>>
+\begin<<331>>tex2html_deferred<<331>>\par\end<<332>>tex2html_deferred<<332>>
+\end<<153>>document<<153>>

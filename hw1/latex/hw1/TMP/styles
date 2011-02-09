@@ -1,0 +1,24 @@
+article 11pt,
+amsmath 
+amsfonts 
+amsthm 
+amssymb 
+fullpage 
+fancyhdr 
+graphicx pdftex
+color usenames,dvipsnames
+listings 
+courier 
+ifthen 
+setspace 
+lastpage 
+extramarks 
+chngpage 
+soul 
+graphicx 
+float 
+wrapfig 
+epstopdf 
+geometry 
+pdfcolmk 
+hyperref 

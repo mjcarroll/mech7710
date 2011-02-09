@@ -1,0 +1,27 @@
+function [ output_args ] = likelihood( Mu, P_x )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+[V,D] = eig(P_x);
+[D order] = sort(diag(D), 'descend');
+D = diag(D);
+V = V(:, order);
+
+theta = 2*pi*[0:0.001:1];
+for ii = 1:length(theta),
+    e(:,ii) = Mu + chol(P_x,'lower')*[cos(theta(ii));sin(theta(ii))];
+end
+
+axis equal, hold on
+
+C = [0.25,1,1.25];
+
+for ii = 1:length(C),
+    plot(C(ii)* e(1,:), C(ii)* e(2,:), 'Color','b');
+end
+
+quiver(Mu(1),Mu(2),V(1,1),V(2,1), 'Color','k')
+quiver(Mu(1),Mu(2),V(1,2),V(2,2), 'Color','k')
+
+end
+

@@ -1,0 +1,109 @@
+
+<tex2html_mydb_mark>#1#% This LaTeX was auto-generated from an M-file by MATLAB.
+
+<tex2html_mydb_mark>#2#% To make changes, update the M-file and republish this document.
+
+<tex2html_mydb_mark>#3#%
+
+<tex2html_mydb_mark>#4#%
+
+<tex2html_mydb_mark>#5#%
+
+<tex2html_mydb_mark>#6#%
+
+<tex2html_mydb_mark>#7#%
+
+<tex2html_mydb_mark>#8#%
+
+<tex2html_mydb_mark>#9#% For faster processing, load Matlab syntax for listings
+
+<tex2html_mydb_mark>#10#%
+
+<tex2html_mydb_mark>#11#% Put standard MATLAB functions not included in the default
+        
+<tex2html_mydb_mark>#12#% language here
+        
+<tex2html_mydb_mark>#13#% Put MATLAB function parameters here
+        
+<tex2html_mydb_mark>#14#% Put user defined functions here
+        
+<tex2html_mydb_mark>#15#% Covariance of 2 independant variables is 0.
+
+<tex2html_mydb_mark>#16#%%% Part B - Covariance Matrix
+
+<tex2html_mydb_mark>#17#%%% Part C - Find the PDF matrix for the variables $v_1=x_1$
+
+<tex2html_mydb_mark>#18#% and $v_2 = x_1 + x_2$. Use [1:6, 1:12], with the first column zeros.
+
+<tex2html_mydb_mark>#19#% end of cell
+
+<tex2html_mydb_mark>#20#% end of cell
+
+<tex2html_mydb_mark>#21#%scatter(v(1000:2000),v(999:1999))
+
+<tex2html_mydb_mark>#22#%likelihood([0;0],P_x)
+
+<tex2html_mydb_mark>#23#% end of cell
+
+<tex2html_mydb_mark>#24#% end of cell
+
+<tex2html_mydb_mark>#25#% end of cell
+
+<tex2html_mydb_mark>#26#% end of cell
+
+<tex2html_mydb_mark>#27#
+mean_v1 =
+
+    3.5000
+
+
+variance_v1 =
+
+    2.9167
+
+
+c_moment_v1 =
+
+     0
+
+
+mean_sq_v1 =
+
+   15.1667
+
+
+P =
+
+    2.9167    2.9167
+    2.9167    5.8333
+
+
+rho_12 =
+
+    0.7071
+<tex2html_mydb_mark>#28#
+mean_v0 =
+
+     0
+
+
+variance_v0 =
+
+    2.9167
+
+
+mean_vn =
+
+   1.6034e-04
+
+
+var_vn =
+
+    0.1579
+
+
+P_x =
+
+    0.1581    0.0024
+    0.0024    0.1586
+<tex2html_mydb_mark>#29#Current plot held
