@@ -359,14 +359,13 @@ The mean in steady state can be determined by writing the $V_N$ formula as an in
 
 $$ \mu_{Vn} = \sum_{-\infty}^{\infty} r(1-r)^n V_o[n] * PDF(V_o[n]) = E[V_o] * \sum_{0}^{\infty} r(1-r)^n = 0$$
 
-Likewise, the variance can be calculated.
+Likewise, the variance can be calculated easily due to the mean of zero.  It is simply squaring the previous term.  Since the mean is zero, the variance is simply equal to the mean-square.
 
-$$ \sigma_n^2 = \sum_{-\infty}^{\infty} r^2 (1-r)^{n} V_o[n]^2 * PDF(V_o[n]) = \sigma_o^2 * \sum_{0}^{\infty} r^2 (1-r)^n = r \sigma_o^2$$
+$$ \sigma_n^2 = \sum_{-\infty}^{\infty} r^2 (1-r)^{2n} V_o[n]^2 * PDF(V_o[n]) = \sigma_o^2 * \sum_{0}^{\infty} r^2 (1-r)^n = \frac{r}{r-2} \sigma_o^2$$
 
-Also, from the properties of the autocorrelation function, we know that $E[V_n]^2 = R_X(0)$.
+I then used Laplace transforms to determine the autocorrelation function of the random sequence:
 
-$$\frac{V_N(s)}{V_o(s)} = \frac{r}{s+(r-1)} = r \exp{\left[(r-1)*|\tau|\right]} $$
-$$ E[V_n]^2 = r \sigma_o^2 $$
+$$V_N(s) = \frac{r}{s+(r-1)} = r \exp{\left[(r-1)*|\tau|\right]} \sigma_o^2 $$
 
 The covariance function follows from the autocorrelation function:
 
