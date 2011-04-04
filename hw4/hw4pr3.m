@@ -28,9 +28,9 @@ sys = ss(A,B,C,D,...
 
 x_hat = zeros(5,length(t));
 P = 1000*eye(5);
-Q_d = 0.0001 * eye(5);
-Q_d(1:3,1:3) = 0.1 * eye(3);
-R_d = 0.01 * eye(3);
+Q_d = 0.001 * eye(5);
+Q_d(1:3,1:3) = 10 * eye(3);
+R_d = 0.1 * eye(3);
 
 for ii = 1:length(t),
     sys.a = [ 0, 0, 0, 0, -cos(x_hat(3,ii));
@@ -57,10 +57,17 @@ for ii = 1:length(t),
     P = dsys.A * P * dsys.A' + Q_d;
 end
 
-subplot(2,2,1); plot(t,y(:,1),t,x_hat(1,1:end-1),'g'); title('Easting');
-subplot(2,2,2); plot(t,y(:,2),t,x_hat(2,1:end-1),'g'); title('Northing');
-subplot(2,2,3); plot(t,y(:,3),t,x_hat(3,1:end-1),'g'); title('Heading');
-subplot(2,2,4); plot(t,x_hat(4,1:end-1)); title('Gyro Bias Estimate')
+figure();
+subplot(3,1,1); plot(t,y(:,1),t,x_hat(1,1:end-1),'g'); title('Easting');
+subplot(3,1,2); plot(t,y(:,2),t,x_hat(2,1:end-1),'g'); title('Northing');
+subplot(3,1,3); plot(t,y(:,3),t,x_hat(3,1:end-1),'g'); title('Heading');
+figure();
+subplot(2,1,1); plot(t,x_hat(4,1:end-1)); title('Gyro Bias Estimate');
+subplot(2,1,2); plot(t,x_hat(5,1:end-1)); title('Radar Bias Estimate');
+figure();
+subplot(3,1,1); plot(t,y(:,1) - x_hat(1,1:end-1)'); title('Easting Residuals');
+subplot(3,1,2); plot(t,y(:,2) - x_hat(2,1:end-1)'); title('Northing Residuals');
+subplot(3,1,3); plot(t,y(:,3) - x_hat(3,1:end-1)'); title('Heading Residuals');
 
 gyro_bias = x_hat(4,end)
 radar_bias = x_hat(5,end)
@@ -127,9 +134,8 @@ sys = ss(A,B,C,D,...
 
 x_hat = zeros(5,length(t));
 P = 1000*eye(5);
-Q_d = 0.1 * eye(5);
-Q_d(4,4) = 1;
-Q_d(1:3,1:3) = 0.1 * eye(3);
+Q_d = 0.001 * eye(5);
+Q_d(1:3,1:3) = 10 * eye(3);
 R_d = 0.1 * eye(3);
 
 for ii = 1:length(t)-200,
@@ -157,20 +163,26 @@ for ii = 1:length(t)-200,
     P = dsys.A * P * dsys.A' + Q_d;
 end
 
+C = zeros(3,5);
+
 for ii = length(t)-200:length(t)
-    sys.a = [ 0, 0, 0, 0, -cos(x_hat(3,ii));
-              0, 0, 0, 0, -sin(x_hat(3,ii));
+    sys.a = [ 0, 0, 0, 0, -sin(x_hat(3,ii));
+              0, 0, 0, 0, -cos(x_hat(3,ii));
               0, 0, 0,-1, 0;
               0, 0, 0, 0, 0;
               0, 0, 0, 0, 0];
         
-    sys.b = [0,cos(x_hat(3,ii));
-             0,sin(x_hat(3,ii));
+    sys.b = [0,sin(x_hat(3,ii));
+             0,cos(x_hat(3,ii));
              1,0;
              0,0;
              0,0];
     
     dsys = c2d(sys,0.2);
+    
+    L = P * dsys.C'/(dsys.C*P*dsys.C' + R_d);
+    %x_hat(:,ii) = x_hat(:,ii) + L * (y(ii,:)' - dsys.C * x_hat(:,ii));
+    P = (eye(5) - L*dsys.C)*P;
     
     % Propagate Forward
     x_hat(:,ii+1) = dsys.A * x_hat(:,ii) + dsys.B*u(ii,:)';
@@ -178,10 +190,16 @@ for ii = length(t)-200:length(t)
 end
 
 figure();
-subplot(2,2,1); plot(t,y(:,1),t,x_hat(1,1:end-1),'g'); title('Easting');
-subplot(2,2,2); plot(t,y(:,2),t,x_hat(2,1:end-1),'g'); title('Northing');
-subplot(2,2,3); plot(t,y(:,3),t,x_hat(3,1:end-1),'g'); title('Heading');
-subplot(2,2,4); plot(t,x_hat(4,1:end-1)); title('Gyro Bias Estimate')
+subplot(3,1,1); plot(t,y(:,1),t,x_hat(1,1:end-1),'g'); title('Easting');
+subplot(3,1,2); plot(t,y(:,2),t,x_hat(2,1:end-1),'g'); title('Northing');
+subplot(3,1,3); plot(t,y(:,3),t,x_hat(3,1:end-1),'g'); title('Heading');
+figure();
+subplot(2,1,1); plot(t,x_hat(4,1:end-1)); title('Gyro Bias Estimate');
+subplot(2,1,2); plot(t,x_hat(5,1:end-1)); title('Radar Bias Estimate');
+figure();
+subplot(3,1,1); plot(t,y(:,1) - x_hat(1,1:end-1)'); title('Easting Residuals');
+subplot(3,1,2); plot(t,y(:,2) - x_hat(2,1:end-1)'); title('Northing Residuals');
+subplot(3,1,3); plot(t,y(:,3) - x_hat(3,1:end-1)'); title('Heading Residuals');
 
 gyro_bias = x_hat(4,end)
 radar_bias = x_hat(5,end)
