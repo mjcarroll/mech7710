@@ -1,0 +1,418 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>hw4pr4</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-03-30"><meta name="DC.source" content="hw4pr4.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Homework 4 - Part 4</a></li><li><a href="#2">Part A</a></li><li><a href="#3">Part B</a></li><li><a href="#4">Part C</a></li><li><a href="#5">Part D</a></li></ul></div><h2>Homework 4 - Part 4<a name="1"></a></h2><p>Estimator for vehicle dynamics</p><pre class="codeinput">clear; clc;
+
+Fs = 10;  Ts = 1/Fs;
+</pre><h2>Part A<a name="2"></a></h2><p>Assuming that we can only measure the yaw rate, design a Kalman filter to do full state estimation.  Provide a unit step steer input and estimate both states.  On one page plot the actual states and estimated states. Where are the steady state poles of the estimator?</p><pre class="codeinput">A = [-2.62, 12; -0.96, -2]; B = [14;1]; C = [1 0]; D = 0;
+[Ad,Bd,Cd,Dd] = c2dm(A,B,C,D,Ts,<span class="string">'zoh'</span>);
+
+plant_d = ss(Ad,[Bd Bd],Cd,Dd,Ts,<span class="keyword">...</span>
+    <span class="string">'inputname'</span>,{<span class="string">'u'</span>,<span class="string">'w'</span>}, <span class="keyword">...</span>
+    <span class="string">'outputname'</span>,<span class="string">'y'</span>,<span class="keyword">...</span>
+    <span class="string">'statename'</span>,{<span class="string">'yawangle'</span>,<span class="string">'slipangle'</span>});
+
+sigma_v = 0.1^2;
+Q = 0.001; R = sigma_v^2;
+
+<span class="comment">% Simulate the system</span>
+t = [0:0.1:20]';
+u = [zeros(1,100),ones(1,length(t)-100)]';
+randn(<span class="string">'seed'</span>,0);
+w = sqrt(Q) * randn(size(t));
+v = sqrt(R) * randn(size(t));
+[y,td,x] = lsim(plant_d,[u,w]);
+yv = y + v;
+
+S = [-Ad, Bd*Q*Bd'; zeros(2), A'];
+C_bryson = expm(S*Ts);
+Q_d = C_bryson(3:4,3:4)' * C_bryson(1:2,3:4);
+R_d = R/Ts;
+
+<span class="comment">%Preallocations</span>
+P = 10*eye(2);
+x_hat = zeros(2,length(t));
+<span class="keyword">for</span> ii = 1:length(t),
+    <span class="comment">% Compute Kalman Gain</span>
+    L = P * Cd'/(Cd*P*Cd' + R_d);
+    x_hat(:,ii) = x_hat(:,ii) + L * (yv(ii) - Cd * x_hat(:,ii));
+    P = (eye(2) - L*Cd)*P;
+    <span class="comment">% Propagate Forward</span>
+    x_hat(:,ii+1) = Ad * x_hat(:,ii) + Bd*u(ii);
+    P = Ad * P * Ad' + Q_d;
+<span class="keyword">end</span>
+
+figure(1);
+plot(t,yv,t,x_hat(1,1:end-1),<span class="string">'g--'</span>);
+xlabel(<span class="string">'Time (s)'</span>); ylabel(<span class="string">'Y and Xhat'</span>);
+title(<span class="string">'System Output vs Estimator Output'</span>);
+figure(2);
+subplot(2,2,1); plot(t,x(:,1)); title(<span class="string">'x1'</span>);
+subplot(2,2,2); plot(t,x_hat(1,1:end-1)'); title(<span class="string">'x1_e'</span>);
+subplot(2,2,3); plot(t,x(:,2)); title(<span class="string">'x2'</span>);
+subplot(2,2,4); plot(t,x_hat(2,1:end-1)'); title(<span class="string">'x2_e'</span>);
+</pre><img vspace="5" hspace="5" src="hw4pr4_01.png" alt=""> <img vspace="5" hspace="5" src="hw4pr4_02.png" alt=""> <h2>Part B<a name="3"></a></h2><p>Part A now with a changed center of gravity</p><p>After trying several Qds, I found that I was unable to overcome the bias that the incorrect model introduced.  No matter how the Kalman filter was tweaked, the fact that the model was incorrect removed my estimation capabilities.</p><pre class="codeinput">A = [-2.42, 4; -0.99, -2]; B = [18;1]; C = [1 0]; D = 0;
+[Adl,Bdl,Cdl,Ddl] = c2dm(A,B,C,D,Ts,<span class="string">'zoh'</span>);
+
+plant_dl = ss(Adl,[Bdl Bdl],Cdl,Ddl,Ts,<span class="keyword">...</span>
+    <span class="string">'inputname'</span>,{<span class="string">'u'</span>,<span class="string">'w'</span>}, <span class="keyword">...</span>
+    <span class="string">'outputname'</span>,<span class="string">'y'</span>,<span class="keyword">...</span>
+    <span class="string">'statename'</span>,{<span class="string">'yawangle'</span>,<span class="string">'slipangle'</span>});
+
+sigma_v = 0.1^2;
+Q = 0.01; R = sigma_v^2;
+
+<span class="comment">% Simulate the system</span>
+<span class="comment">% t = [0:0.1:20]';</span>
+<span class="comment">% u = [zeros(1,100),ones(1,length(t)-100)]';</span>
+<span class="comment">% randn('seed',0);</span>
+<span class="comment">% w = sqrt(Q) * randn(size(t));</span>
+<span class="comment">% v = sqrt(R) * randn(size(t));</span>
+[y,td,x] = lsim(plant_dl,[u,w]);
+yv = y + v;
+
+<span class="comment">%Preallocations</span>
+P = 10*eye(2);
+x_hat = zeros(2,length(t));
+<span class="keyword">for</span> ii = 1:length(t),
+    <span class="comment">% Compute Kalman Gain</span>
+    L = P * Cd'/(Cd*P*Cd' + R_d);
+    x_hat(:,ii) = x_hat(:,ii) + L * (yv(ii) - Cd * x_hat(:,ii));
+    P = (eye(2) - L*Cd)*P;
+
+    <span class="comment">% Propagate Forward</span>
+    x_hat(:,ii+1) = Ad * x_hat(:,ii) + Bd*u(ii);
+    P = Ad * P * Ad' + Q_d;
+<span class="keyword">end</span>
+
+figure(3);
+plot(t,yv,t,x_hat(1,1:end-1),<span class="string">'g--'</span>);
+xlabel(<span class="string">'Time (s)'</span>); ylabel(<span class="string">'Y and Xhat'</span>);
+title(<span class="string">'System Output vs Estimator Output'</span>);
+figure(4);
+ax(1) = subplot(2,2,1); plot(t,x(:,1)); title(<span class="string">'x1'</span>);
+ax(2) = subplot(2,2,2); plot(t,x_hat(1,1:end-1)'); title(<span class="string">'x1_e'</span>);
+ax(3) = subplot(2,2,3); plot(t,x(:,2)); title(<span class="string">'x2'</span>);
+ax(4) = subplot(2,2,4); plot(t,x_hat(2,1:end-1)'); title(<span class="string">'x2_e'</span>);
+pause(2);
+linkaxes([ax(1),ax(2)],<span class="string">'xy'</span>);
+linkaxes([ax(3),ax(4)],<span class="string">'xy'</span>);
+</pre><img vspace="5" hspace="5" src="hw4pr4_03.png" alt=""> <img vspace="5" hspace="5" src="hw4pr4_04.png" alt=""> <h2>Part C<a name="4"></a></h2><p>Add a noisy slip angle.  Assuming that the sensor noises are uncorrelated, what is R?</p><pre class="codeinput">sigma_v = 0.1^2; sigma_nu = 0.5^2;
+R = [sigma_v^2, 0; 0, sigma_nu^2]
+</pre><pre class="codeoutput">R =
+    0.0001         0
+         0    0.0625
+</pre><h2>Part D<a name="5"></a></h2><p>Redo part A with the noisy slip angle</p><pre class="codeinput">A = [-2.62, 12; -0.96, -2]; B = [14;1]; C = [1 0; 0 1]; D = [0;0];
+[Ad,Bd,Cd,Dd] = c2dm(A,B,C,D,Ts,<span class="string">'zoh'</span>);
+
+plant_d = ss(Ad,Bd,Cd,Dd,Ts,<span class="keyword">...</span>
+    <span class="string">'inputname'</span>,{<span class="string">'u+w'</span>}, <span class="keyword">...</span>
+    <span class="string">'outputname'</span>,{<span class="string">'y'</span>,<span class="string">'slipangle'</span>},<span class="keyword">...</span>
+    <span class="string">'statename'</span>,{<span class="string">'yawangle'</span>,<span class="string">'slipangle'</span>});
+
+Q = 0.001;
+sigma_v = 0.1^2; sigma_nu = 0.5^2;
+R = [sigma_v^2, 0; 0, sigma_nu^2];
+
+<span class="comment">% Simulate the system</span>
+t = [0:0.1:20]';
+u = [zeros(1,100),ones(1,length(t)-100)]';
+randn(<span class="string">'seed'</span>,0);
+w = sqrt(Q) * randn(size(t));
+v = sqrt(R) * randn(length(t),2)';
+[y,td,x] = lsim(plant_d,[u+w]);
+yv = y + v';
+
+S = [-Ad, Bd*Q*Bd'; zeros(2), A'];
+C_bryson = expm(S*Ts);
+Q_d = C_bryson(3:4,3:4)' * C_bryson(1:2,3:4);
+R_d = R/Ts;
+</pre><p>I tried several values of Q_d(2,2), and found that it had to be in the neighborhood of the Q of the system.  If Q was much larger than that value, then the estimate tended to be biased.  If Q was much smaller than that value, then it tended to "over-filter", and the actual behaviors of the system were not being caught by the filter.</p><p>It seems that there was a tuned sweet-spot on the filter where Q_d matched the Q_c of the system.</p><pre class="codeinput"><span class="comment">%Q_d(2,2) = 1.5692e-07</span>
+<span class="comment">%Q_d(2,2) = 0.000000000000001;</span>
+Q_d(2,2) = .001;
+<span class="comment">%Preallocations</span>
+P = 10*eye(2);
+x_hat = zeros(2,length(t));
+<span class="keyword">for</span> ii = 1:length(t),
+    <span class="comment">% Compute Kalman Gain</span>
+    L = P * Cd'/(Cd*P*Cd' + R_d);
+    x_hat(:,ii) = x_hat(:,ii) + L * (yv(ii) - Cd * x_hat(:,ii));
+    P = (eye(2) - L*Cd)*P;
+    <span class="comment">% Propagate Forward</span>
+    x_hat(:,ii+1) = Ad * x_hat(:,ii) + Bd*u(ii);
+    P = Ad * P * Ad' + Q_d;
+<span class="keyword">end</span>
+
+figure(5);
+subplot(2,1,1);
+plot(t,yv(:,1),t,x_hat(1,1:end-1),<span class="string">'g--'</span>);
+subplot(2,1,2);
+plot(t,yv(:,2),t,x_hat(2,1:end-1),<span class="string">'g--'</span>);
+
+xlabel(<span class="string">'Time (s)'</span>); ylabel(<span class="string">'Y and Xhat'</span>);
+title(<span class="string">'System Output vs Estimator Output'</span>);
+figure(6);
+ax(1) = subplot(2,2,1); plot(t,x(:,1)); title(<span class="string">'x1'</span>);
+ax(2) = subplot(2,2,2); plot(t,x_hat(1,1:end-1)'); title(<span class="string">'x1_e'</span>);
+ax(3) = subplot(2,2,3); plot(t,x(:,2)); title(<span class="string">'x2'</span>);
+ax(4) = subplot(2,2,4); plot(t,x_hat(2,1:end-1)'); title(<span class="string">'x2_e'</span>);
+pause(3);
+linkaxes([ax(1),ax(2)],<span class="string">'xy'</span>);
+linkaxes([ax(3),ax(4)],<span class="string">'xy'</span>);
+</pre><img vspace="5" hspace="5" src="hw4pr4_05.png" alt=""> <img vspace="5" hspace="5" src="hw4pr4_06.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Homework 4 - Part 4
+% Estimator for vehicle dynamics
+clear; clc;
+
+Fs = 10;  Ts = 1/Fs;
+
+%% Part A
+% Assuming that we can only measure the yaw rate, design a Kalman filter to
+% do full state estimation.  Provide a unit step steer input and estimate
+% both states.  On one page plot the actual states and estimated states.
+% Where are the steady state poles of the estimator?
+
+A = [-2.62, 12; -0.96, -2]; B = [14;1]; C = [1 0]; D = 0;
+[Ad,Bd,Cd,Dd] = c2dm(A,B,C,D,Ts,'zoh');
+
+plant_d = ss(Ad,[Bd Bd],Cd,Dd,Ts,...
+    'inputname',{'u','w'}, ...
+    'outputname','y',...
+    'statename',{'yawangle','slipangle'});
+
+sigma_v = 0.1^2;
+Q = 0.001; R = sigma_v^2;
+
+% Simulate the system
+t = [0:0.1:20]';
+u = [zeros(1,100),ones(1,length(t)-100)]';
+randn('seed',0);
+w = sqrt(Q) * randn(size(t));
+v = sqrt(R) * randn(size(t));
+[y,td,x] = lsim(plant_d,[u,w]);
+yv = y + v;
+
+S = [-Ad, Bd*Q*Bd'; zeros(2), A'];
+C_bryson = expm(S*Ts);
+Q_d = C_bryson(3:4,3:4)' * C_bryson(1:2,3:4);
+R_d = R/Ts;
+
+%Preallocations
+P = 10*eye(2);
+x_hat = zeros(2,length(t));
+for ii = 1:length(t),
+    % Compute Kalman Gain
+    L = P * Cd'/(Cd*P*Cd' + R_d);
+    x_hat(:,ii) = x_hat(:,ii) + L * (yv(ii) - Cd * x_hat(:,ii));
+    P = (eye(2) - L*Cd)*P;
+    % Propagate Forward
+    x_hat(:,ii+1) = Ad * x_hat(:,ii) + Bd*u(ii);
+    P = Ad * P * Ad' + Q_d;
+end
+
+figure(1);
+plot(t,yv,t,x_hat(1,1:end-1),'gREPLACE_WITH_DASH_DASH');
+xlabel('Time (s)'); ylabel('Y and Xhat');
+title('System Output vs Estimator Output');
+figure(2);
+subplot(2,2,1); plot(t,x(:,1)); title('x1');
+subplot(2,2,2); plot(t,x_hat(1,1:end-1)'); title('x1_e');
+subplot(2,2,3); plot(t,x(:,2)); title('x2');
+subplot(2,2,4); plot(t,x_hat(2,1:end-1)'); title('x2_e');
+
+%% Part B
+% Part A now with a changed center of gravity
+%
+% After trying several Qds, I found that I was unable to overcome the bias
+% that the incorrect model introduced.  No matter how the Kalman filter was
+% tweaked, the fact that the model was incorrect removed my estimation
+% capabilities.
+A = [-2.42, 4; -0.99, -2]; B = [18;1]; C = [1 0]; D = 0;
+[Adl,Bdl,Cdl,Ddl] = c2dm(A,B,C,D,Ts,'zoh');
+
+plant_dl = ss(Adl,[Bdl Bdl],Cdl,Ddl,Ts,...
+    'inputname',{'u','w'}, ...
+    'outputname','y',...
+    'statename',{'yawangle','slipangle'});
+
+sigma_v = 0.1^2;
+Q = 0.01; R = sigma_v^2;
+
+% Simulate the system
+% t = [0:0.1:20]';
+% u = [zeros(1,100),ones(1,length(t)-100)]';
+% randn('seed',0);
+% w = sqrt(Q) * randn(size(t));
+% v = sqrt(R) * randn(size(t));
+[y,td,x] = lsim(plant_dl,[u,w]);
+yv = y + v;
+
+%Preallocations
+P = 10*eye(2);
+x_hat = zeros(2,length(t));
+for ii = 1:length(t),
+    % Compute Kalman Gain
+    L = P * Cd'/(Cd*P*Cd' + R_d);
+    x_hat(:,ii) = x_hat(:,ii) + L * (yv(ii) - Cd * x_hat(:,ii));
+    P = (eye(2) - L*Cd)*P;
+
+    % Propagate Forward
+    x_hat(:,ii+1) = Ad * x_hat(:,ii) + Bd*u(ii);
+    P = Ad * P * Ad' + Q_d;
+end
+
+figure(3);
+plot(t,yv,t,x_hat(1,1:end-1),'gREPLACE_WITH_DASH_DASH');
+xlabel('Time (s)'); ylabel('Y and Xhat');
+title('System Output vs Estimator Output');
+figure(4);
+ax(1) = subplot(2,2,1); plot(t,x(:,1)); title('x1');
+ax(2) = subplot(2,2,2); plot(t,x_hat(1,1:end-1)'); title('x1_e');
+ax(3) = subplot(2,2,3); plot(t,x(:,2)); title('x2');
+ax(4) = subplot(2,2,4); plot(t,x_hat(2,1:end-1)'); title('x2_e');
+pause(2);
+linkaxes([ax(1),ax(2)],'xy');
+linkaxes([ax(3),ax(4)],'xy');
+
+%% Part C
+% Add a noisy slip angle.  Assuming that the sensor noises are
+% uncorrelated, what is R?
+
+sigma_v = 0.1^2; sigma_nu = 0.5^2;
+R = [sigma_v^2, 0; 0, sigma_nu^2]
+
+%% Part D
+% Redo part A with the noisy slip angle
+A = [-2.62, 12; -0.96, -2]; B = [14;1]; C = [1 0; 0 1]; D = [0;0];
+[Ad,Bd,Cd,Dd] = c2dm(A,B,C,D,Ts,'zoh');
+
+plant_d = ss(Ad,Bd,Cd,Dd,Ts,...
+    'inputname',{'u+w'}, ...
+    'outputname',{'y','slipangle'},...
+    'statename',{'yawangle','slipangle'});
+
+Q = 0.001;
+sigma_v = 0.1^2; sigma_nu = 0.5^2;
+R = [sigma_v^2, 0; 0, sigma_nu^2];
+
+% Simulate the system
+t = [0:0.1:20]';
+u = [zeros(1,100),ones(1,length(t)-100)]';
+randn('seed',0);
+w = sqrt(Q) * randn(size(t));
+v = sqrt(R) * randn(length(t),2)';
+[y,td,x] = lsim(plant_d,[u+w]);
+yv = y + v';
+
+S = [-Ad, Bd*Q*Bd'; zeros(2), A'];
+C_bryson = expm(S*Ts);
+Q_d = C_bryson(3:4,3:4)' * C_bryson(1:2,3:4);
+R_d = R/Ts;
+
+%%
+% I tried several values of Q_d(2,2), and found that it had to be in the neighborhood of
+% the Q of the system.  If Q was much larger than that value, then the
+% estimate tended to be biased.  If Q was much smaller than that value,
+% then it tended to "over-filter", and the actual behaviors of the system
+% were not being caught by the filter.
+%
+% It seems that there was a tuned sweet-spot on the filter where Q_d
+% matched the Q_c of the system.
+
+%Q_d(2,2) = 1.5692e-07
+%Q_d(2,2) = 0.000000000000001;
+Q_d(2,2) = .001;
+%Preallocations
+P = 10*eye(2);
+x_hat = zeros(2,length(t));
+for ii = 1:length(t),
+    % Compute Kalman Gain
+    L = P * Cd'/(Cd*P*Cd' + R_d);
+    x_hat(:,ii) = x_hat(:,ii) + L * (yv(ii) - Cd * x_hat(:,ii));
+    P = (eye(2) - L*Cd)*P;
+    % Propagate Forward
+    x_hat(:,ii+1) = Ad * x_hat(:,ii) + Bd*u(ii);
+    P = Ad * P * Ad' + Q_d;
+end
+
+figure(5);
+subplot(2,1,1);
+plot(t,yv(:,1),t,x_hat(1,1:end-1),'gREPLACE_WITH_DASH_DASH');
+subplot(2,1,2);
+plot(t,yv(:,2),t,x_hat(2,1:end-1),'gREPLACE_WITH_DASH_DASH');
+
+xlabel('Time (s)'); ylabel('Y and Xhat');
+title('System Output vs Estimator Output');
+figure(6);
+ax(1) = subplot(2,2,1); plot(t,x(:,1)); title('x1');
+ax(2) = subplot(2,2,2); plot(t,x_hat(1,1:end-1)'); title('x1_e');
+ax(3) = subplot(2,2,3); plot(t,x(:,2)); title('x2');
+ax(4) = subplot(2,2,4); plot(t,x_hat(2,1:end-1)'); title('x2_e');
+pause(3);
+linkaxes([ax(1),ax(2)],'xy');
+linkaxes([ax(3),ax(4)],'xy');
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,305 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>hw4pr1</title><meta name="generator" content="MATLAB 7.11"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-03-30"><meta name="DC.source" content="hw4pr1.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Homework 4 - Problem 1</a></li><li><a href="#2">Part A</a></li><li><a href="#3">Part B</a></li><li><a href="#4">Part C</a></li><li><a href="#5">Part D</a></li><li><a href="#6">Part E</a></li></ul></div><h2>Homework 4 - Problem 1<a name="1"></a></h2><p>Kalman filter at its best - simulation.  Suppose we have a 2nd order system that we are regulating about zero (position and velocity) by wrapping an "optimal" control loop around the system.  The new dynamics of the continuous time system are given by the closed-loop A matrix:</p><p>Suppose our measurement is simply position (C=[1 0]).  There is a white noise process disturbance (force, B_w = [0 1]^T) acting on the controlled system.</p><pre class="codeinput">clear; clc; close <span class="string">all</span>; format <span class="string">compact</span>; format <span class="string">short</span>;
+Fs = 10; Ts = 1/Fs;
+A_cl = [0, 1; -1, -1.4];
+C = [1, 0];
+Bw = [0, 1]';
+D = [0,1];
+</pre><h2>Part A<a name="2"></a></h2><p>Simulate the controlled system with the disturbance force (1\sigma = 2) and a sampled sensor noise (1\sigma = 1) for 100 seconds at 10Hz.</p><pre class="codeinput">sigma_q = 2;
+sigma_r = 1;
+
+t = 0:Ts:100;
+w = sigma_q * randn(size(t));
+v = sigma_r * randn(size(t));
+
+[Ad,Bd,Cd,Dd] = c2dm(A_cl,Bw,C,0,Ts,<span class="string">'zoh'</span>);
+
+dPlant = ss(Ad,[zeros(size(Bd)),Bd,zeros(size(Bd))],Cd,[0,0,1],Ts,<span class="keyword">...</span>
+    <span class="string">'statename'</span>,{<span class="string">'position'</span> <span class="string">'velocity'</span>},<span class="keyword">...</span>
+    <span class="string">'inputname'</span>,{<span class="string">'u'</span>,<span class="string">'w'</span>,<span class="string">'v'</span>},<span class="keyword">...</span>
+    <span class="string">'outputname'</span>,{<span class="string">'y'</span>});
+
+[y_d,t_d,x_d] = lsim(dPlant,[zeros(size(t));w;v]);
+
+figure(1); plot(t_d,y_d);
+xlabel(<span class="string">'Time (s)'</span>); ylabel(<span class="string">'Position Measurement'</span>);
+title(<span class="string">'Simulated Digital System'</span>);
+</pre><img vspace="5" hspace="5" src="hw4pr1_01.png" alt=""> <h2>Part B<a name="3"></a></h2><p>What is Q, Q_d and R_d?</p><pre class="codeinput">Q = sigma_q^2
+R = sigma_r^2
+<span class="comment">% Bryson's Trick</span>
+S = [-A_cl, Bw*Q*Bw'; zeros(2), A_cl'];
+C_bryson = expm(S*Ts);
+Q_d = C_bryson(3:4,3:4)' * C_bryson(1:2,3:4)
+R_d = sigma_r^2/Ts
+</pre><pre class="codeoutput">Q =
+     4
+R =
+     1
+Q_d =
+    0.0012    0.0174
+    0.0174    0.3478
+R_d =
+    10
+</pre><h2>Part C<a name="4"></a></h2><p>Calculate the steady state Kalman gain for the system.  This can be done in one of many ways: iterate the Kalman filter until it converges, dlqe.m, dare.m, kalman.m, dlqr.m (+ predictor to current estimator trick), tec.  What is the steady state covariance of the estimates after the time update, P^{(-)}, as well as after the measurement update, P^{(+)}.  Where are the poles of the estimator?</p><pre class="codeinput"><span class="comment">%[M,P,Z,E] = lqed(A_cl, Bw, C, Q, R, Ts);</span>
+[M,P,Z,E] = dlqe(Ad, eye(2), Cd, Q_d, R_d);
+
+P_plus = P
+P_minus = Ad * P_plus * Ad' + Q_d
+L = M
+Poles = E
+figure(2);
+zplane([],E);
+</pre><pre class="codeoutput">P_plus =
+    0.7307    0.2570
+    0.2570    1.2315
+P_minus =
+    0.7833    0.2678
+    0.2678    1.2337
+L =
+    0.0681
+    0.0239
+Poles =
+   0.8950 + 0.0954i
+   0.8950 - 0.0954i
+</pre><img vspace="5" hspace="5" src="hw4pr1_02.png" alt=""> <h2>Part D<a name="5"></a></h2><p>Use the steady state Kalman filter to generate an estimate of the 2 states over time.  Calculate the norm of the standard deviation of the errors for each state.</p><pre class="codeinput">x_hat_minus = zeros(size(x_d))';
+x_hat_plus = zeros(size(x_d))';
+
+<span class="keyword">for</span> k = 1:length(y_d),
+    x_hat_plus(:,k) = x_hat_minus(:,k) + <span class="keyword">...</span>
+        L * (y_d(k) - Cd * x_hat_minus(:,k));
+    x_hat_minus(:,k+1) = Ad * x_hat_plus(:,k);
+<span class="keyword">end</span>
+err = x_d - x_hat_plus';
+N = norm(std(err(:,1)),std(err(:,2)))
+</pre><pre class="codeoutput">N =
+    0.2481
+</pre><h2>Part E<a name="6"></a></h2><p>Change the ratio of the Q and Rd weights in the Kalman filter design. Find what ratio of Q to R minimizes the errors.</p><pre class="codeinput">[X,Y] = meshgrid(0.1:0.2:6);
+N = zeros(size(X));
+<span class="keyword">for</span> ii = 1:length(X),
+    <span class="keyword">for</span> jj = 1:length(Y),
+        Q = X(ii,jj); R = Y(ii,jj);
+        <span class="comment">% Bryson's Trick</span>
+        S = [-A_cl, Bw*Q*Bw'; zeros(2), A_cl'];
+        C_bryson = expm(S*Ts);
+        Q_d = C_bryson(3:4,3:4)' * C_bryson(1:2,3:4);
+        R_d = R/Ts;
+        [M,P,Z,E] = dlqe(Ad, eye(2), Cd, Q_d, R_d);
+        P_plus = P;
+        P_minus = Ad * P_plus * Ad' + Q_d;
+        L = M;
+        x_hat_minus = zeros(size(x_d))';
+        x_hat_plus = zeros(size(x_d))';
+        <span class="keyword">for</span> k = 1:length(y_d),
+            x_hat_plus(:,k) = x_hat_minus(:,k) + <span class="keyword">...</span>
+                L * (y_d(k) - Cd * x_hat_minus(:,k));
+            x_hat_minus(:,k+1) = Ad * x_hat_plus(:,k);
+        <span class="keyword">end</span>
+        err = x_d - x_hat_plus';
+        N(ii,jj) = norm(std(err(:,1)),std(err(:,2)));
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p>Using a mesh, I can visualize the effect of varying Q and R have on the Kalman filter's error. Using MATLAB's min() function reveals the location of Q and R that minimizes the error.</p><pre class="codeinput">mesh(X,Y,N)
+xlabel(<span class="string">'Q'</span>); ylabel(<span class="string">'R'</span>), zlabel(<span class="string">'Norm(xhat - x)'</span>);
+[I,J] = find(N==min(N(:)))
+Q = X(I,J)
+R = Y(I,J)
+</pre><pre class="codeoutput">I =
+     8
+J =
+    30
+Q =
+    5.9000
+R =
+    1.5000
+</pre><img vspace="5" hspace="5" src="hw4pr1_03.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.11<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Homework 4 - Problem 1
+% Kalman filter at its best - simulation.  Suppose we have a 2nd order
+% system that we are regulating about zero (position and velocity) by
+% wrapping an "optimal" control loop around the system.  The new dynamics
+% of the continuous time system are given by the closed-loop A matrix:
+%
+% Suppose our measurement is simply position (C=[1 0]).  There is a white
+% noise process disturbance (force, B_w = [0 1]^T) acting on the controlled
+% system.
+
+clear; clc; close all; format compact; format short;
+Fs = 10; Ts = 1/Fs;
+A_cl = [0, 1; -1, -1.4];
+C = [1, 0];
+Bw = [0, 1]';
+D = [0,1];
+
+%% Part A
+% Simulate the controlled system with the disturbance force (1\sigma = 2)
+% and a sampled sensor noise (1\sigma = 1) for 100 seconds at 10Hz.
+
+sigma_q = 2;
+sigma_r = 1;
+
+t = 0:Ts:100;
+w = sigma_q * randn(size(t));
+v = sigma_r * randn(size(t));
+
+[Ad,Bd,Cd,Dd] = c2dm(A_cl,Bw,C,0,Ts,'zoh');
+
+dPlant = ss(Ad,[zeros(size(Bd)),Bd,zeros(size(Bd))],Cd,[0,0,1],Ts,...
+    'statename',{'position' 'velocity'},...
+    'inputname',{'u','w','v'},...
+    'outputname',{'y'});
+
+[y_d,t_d,x_d] = lsim(dPlant,[zeros(size(t));w;v]);
+
+figure(1); plot(t_d,y_d);
+xlabel('Time (s)'); ylabel('Position Measurement');
+title('Simulated Digital System');
+
+%% Part B
+% What is Q, Q_d and R_d?
+
+Q = sigma_q^2
+R = sigma_r^2
+% Bryson's Trick
+S = [-A_cl, Bw*Q*Bw'; zeros(2), A_cl'];
+C_bryson = expm(S*Ts);
+Q_d = C_bryson(3:4,3:4)' * C_bryson(1:2,3:4)
+R_d = sigma_r^2/Ts
+
+%% Part C
+% Calculate the steady state Kalman gain for the system.  This can be done
+% in one of many ways: iterate the Kalman filter until it converges,
+% dlqe.m, dare.m, kalman.m, dlqr.m (+ predictor to current estimator
+% trick), tec.  What is the steady state covariance of the estimates after
+% the time update, P^{(-)}, as well as after the measurement update,
+% P^{(+)}.  Where are the poles of the estimator?
+
+%[M,P,Z,E] = lqed(A_cl, Bw, C, Q, R, Ts);
+[M,P,Z,E] = dlqe(Ad, eye(2), Cd, Q_d, R_d);
+
+P_plus = P
+P_minus = Ad * P_plus * Ad' + Q_d
+L = M
+Poles = E
+figure(2);
+zplane([],E);
+
+%% Part D
+% Use the steady state Kalman filter to generate an estimate of the 2
+% states over time.  Calculate the norm of the standard deviation of the
+% errors for each state.
+x_hat_minus = zeros(size(x_d))';
+x_hat_plus = zeros(size(x_d))';
+
+for k = 1:length(y_d),
+    x_hat_plus(:,k) = x_hat_minus(:,k) + ...
+        L * (y_d(k) - Cd * x_hat_minus(:,k));
+    x_hat_minus(:,k+1) = Ad * x_hat_plus(:,k);
+end
+err = x_d - x_hat_plus';
+N = norm(std(err(:,1)),std(err(:,2)))
+
+%% Part E
+% Change the ratio of the Q and Rd weights in the Kalman filter design.
+% Find what ratio of Q to R minimizes the errors.
+
+[X,Y] = meshgrid(0.1:0.2:6);
+N = zeros(size(X));
+for ii = 1:length(X),
+    for jj = 1:length(Y),
+        Q = X(ii,jj); R = Y(ii,jj);
+        % Bryson's Trick
+        S = [-A_cl, Bw*Q*Bw'; zeros(2), A_cl'];
+        C_bryson = expm(S*Ts);
+        Q_d = C_bryson(3:4,3:4)' * C_bryson(1:2,3:4);
+        R_d = R/Ts;
+        [M,P,Z,E] = dlqe(Ad, eye(2), Cd, Q_d, R_d);
+        P_plus = P;
+        P_minus = Ad * P_plus * Ad' + Q_d;
+        L = M;
+        x_hat_minus = zeros(size(x_d))';
+        x_hat_plus = zeros(size(x_d))';
+        for k = 1:length(y_d),
+            x_hat_plus(:,k) = x_hat_minus(:,k) + ...
+                L * (y_d(k) - Cd * x_hat_minus(:,k));
+            x_hat_minus(:,k+1) = Ad * x_hat_plus(:,k);
+        end
+        err = x_d - x_hat_plus';
+        N(ii,jj) = norm(std(err(:,1)),std(err(:,2)));
+    end
+end
+
+%%%
+% Using a mesh, I can visualize the effect of varying Q and R have on the
+% Kalman filter's error. Using MATLAB's min() function reveals the
+% location of Q and R that minimizes the error.
+mesh(X,Y,N)
+xlabel('Q'); ylabel('R'), zlabel('Norm(xhat - x)');
+[I,J] = find(N==min(N(:)))
+Q = X(I,J)
+R = Y(I,J)
+##### SOURCE END #####
+--></body></html>
